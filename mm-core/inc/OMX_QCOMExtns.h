@@ -421,14 +421,41 @@ enum OMX_QCOM_EXTN_INDEXTYPE
     /* "OMX.QCOM.index.param.video.FramePackingExtradata" */
     OMX_QcomIndexParamVideoFramePackingExtradata = 0x7F00002D,
 
+    /* "OMX.QCOM.index.config.activeregiondetection" */
+    OMX_QcomIndexConfigActiveRegionDetection = 0x7F00002E,
+
+    /* "OMX.QCOM.index.config.activeregiondetectionstatus" */
+    OMX_QcomIndexConfigActiveRegionDetectionStatus = 0x7F00002F,
+
+    /* "OMX.QCOM.index.config.scalingmode" */
+    OMX_QcomIndexConfigScalingMode = 0x7F000030,
+
+    /* "OMX.QCOM.index.config.noisereduction" */
+    OMX_QcomIndexConfigNoiseReduction = 0x7F000031,
+
+    /* "OMX.QCOM.index.config.imageenhancement" */
+    OMX_QcomIndexConfigImageEnhancement = 0x7F000032,
+
+    /* google smooth-streaming support */
+    OMX_QcomIndexParamVideoAdaptivePlaybackMode = 0x7F000033,
+
+    /* H.264 MVC codec index */
+    QOMX_IndexParamVideoMvc = 0x7F000034,
+
     /* "OMX.QCOM.index.param.video.QPExtradata" */
-    OMX_QcomIndexParamVideoQPExtraData = 0x7F00002F,
+    OMX_QcomIndexParamVideoQPExtraData = 0x7F000035,
 
     /* "OMX.QCOM.index.param.video.InputBitsInfoExtradata" */
-    OMX_QcomIndexParamVideoInputBitsInfoExtraData = 0x7F000030,
+    OMX_QcomIndexParamVideoInputBitsInfoExtraData = 0x7F000036,
 
     /* VP8 Hierarchical P support */
-    OMX_QcomIndexHierarchicalStructure = 0x7F000031,
+    OMX_QcomIndexHierarchicalStructure = 0x7F000037,
+
+    OMX_QcomIndexParamPerfLevel = 0x7F000038,
+
+    OMX_QcomIndexParamH264VUITimingInfo = 0x7F000039,
+
+    OMX_QcomIndexParamPeakBitrate = 0x7F00003A,
 
     /*"OMX.QCOM.index.param.video.LTRCount"*/
     OMX_QcomIndexParamVideoLTRCount = QOMX_IndexParamVideoLTRCount,
@@ -439,22 +466,10 @@ enum OMX_QCOM_EXTN_INDEXTYPE
     /*"OMX.QCOM.index.config.video.LTRMark"*/
     OMX_QcomIndexConfigVideoLTRMark = QOMX_IndexConfigVideoLTRMark,
 
-    OMX_QcomIndexParamPerfLevel = 0x7F000032,
-
-    /* google smooth-streaming support */
-    OMX_QcomIndexParamVideoAdaptivePlaybackMode = 0x7F000033,
-
-    /* H.264 MVC codec index */
-    QOMX_IndexParamVideoMvc = 0x7F000034,
-
-    OMX_QcomIndexParamH264VUITimingInfo = 0x7F000039,
-
-    OMX_QcomIndexParamPeakBitrate = 0x7F00003A,
-
     /* Enable InitialQP index */
     QOMX_IndexParamVideoInitialQp = 0x7F00003B,
 
-    OMX_QcomIndexParamSetMVSearchrange = 0x7F00003C,
+OMX_QcomIndexParamSetMVSearchrange = 0x7F00003C,
 };
  
 /**
@@ -1327,6 +1342,102 @@ typedef enum QOMX_VIDEO_PICTURETYPE {
     QOMX_VIDEO_PictureTypeIDR = OMX_VIDEO_PictureTypeVendorStartUnused + 0x1000
 } QOMX_VIDEO_PICTURETYPE;
 
+#define OMX_QCOM_INDEX_CONFIG_ACTIVE_REGION_DETECTION           "OMX.QCOM.index.config.activeregiondetection"
+#define OMX_QCOM_INDEX_CONFIG_ACTIVE_REGION_DETECTION_STATUS    "OMX.QCOM.index.config.activeregiondetectionstatus"
+#define OMX_QCOM_INDEX_CONFIG_SCALING_MODE                      "OMX.QCOM.index.config.scalingmode"
+#define OMX_QCOM_INDEX_CONFIG_NOISEREDUCTION                    "OMX.QCOM.index.config.noisereduction"
+#define OMX_QCOM_INDEX_CONFIG_IMAGEENHANCEMENT                  "OMX.QCOM.index.config.imageenhancement"
+#define OMX_QCOM_INDEX_PARAM_HELDBUFFERCOUNT                    "OMX.QCOM.index.param.HeldBufferCount" /**< reference: QOMX_HELDBUFFERCOUNTTYPE */
+
+
+typedef struct QOMX_RECTTYPE {
+    OMX_S32 nLeft;
+    OMX_S32 nTop;
+    OMX_U32 nWidth;
+    OMX_U32 nHeight;
+} QOMX_RECTTYPE;
+
+typedef struct QOMX_ACTIVEREGIONDETECTIONTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bEnable;
+    QOMX_RECTTYPE sROI;
+    OMX_U32 nNumExclusionRegions;
+    QOMX_RECTTYPE sExclusionRegions[1];
+} QOMX_ACTIVEREGIONDETECTIONTYPE;
+
+typedef struct QOMX_ACTIVEREGIONDETECTION_STATUSTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bDetected;
+    QOMX_RECTTYPE sDetectedRegion;
+} QOMX_ACTIVEREGIONDETECTION_STATUSTYPE;
+
+typedef enum QOMX_SCALE_MODETYPE {
+    QOMX_SCALE_MODE_Normal,
+    QOMX_SCALE_MODE_Anamorphic,
+    QOMX_SCALE_MODE_Max = 0x7FFFFFFF
+} QOMX_SCALE_MODETYPE;
+
+typedef struct QOMX_SCALINGMODETYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    QOMX_SCALE_MODETYPE  eScaleMode;
+} QOMX_SCALINGMODETYPE;
+
+typedef struct QOMX_NOISEREDUCTIONTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bEnable;
+    OMX_BOOL bAutoMode;
+    OMX_S32 nNoiseReduction;
+} QOMX_NOISEREDUCTIONTYPE;
+
+typedef struct QOMX_IMAGEENHANCEMENTTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_BOOL bEnable;
+    OMX_BOOL bAutoMode;
+    OMX_S32 nImageEnhancement;
+} QOMX_IMAGEENHANCEMENTTYPE;
+
+/*
+ * these are part of OMX1.2 but JB MR2 branch doesn't have them defined
+ * OMX_IndexParamInterlaceFormat
+ * OMX_INTERLACEFORMATTYPE
+ */
+#ifndef OMX_IndexParamInterlaceFormat
+#define OMX_IndexParamInterlaceFormat (0x7FF00000)
+typedef struct OMX_INTERLACEFORMATTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nFormat;
+    OMX_TICKS nTimeStamp;
+} OMX_INTERLACEFORMATTYPE;
+#endif
+
+/**
+ * This structure is used to indicate the maximum number of buffers
+ * that a port will hold during data flow.
+ *
+ * STRUCT MEMBERS:
+ *  nSize              : Size of the structure in bytes
+ *  nVersion           : OMX specification version info
+ *  nPortIndex         : Port that this structure applies to
+ *  nHeldBufferCount   : Read-only, maximum number of buffers that will be held
+ */
+typedef struct QOMX_HELDBUFFERCOUNTTYPE {
+    OMX_U32 nSize;
+    OMX_VERSIONTYPE nVersion;
+    OMX_U32 nPortIndex;
+    OMX_U32 nHeldBufferCount;
+} QOMX_HELDBUFFERCOUNTTYPE;
+
 typedef enum QOMX_VIDEO_HIERARCHICALCODINGTYPE {
     QOMX_HIERARCHICALCODING_P = 0x01,
     QOMX_HIERARCHICALCODING_B = 0x02,
@@ -1339,6 +1450,7 @@ typedef struct QOMX_VIDEO_HIERARCHICALLAYERS {
     OMX_U32 nNumLayers;
     QOMX_VIDEO_HIERARCHICALCODINGTYPE eHierarchicalCodingType;
 } QOMX_VIDEO_HIERARCHICALLAYERS;
+
 
 #ifdef __cplusplus
 }
