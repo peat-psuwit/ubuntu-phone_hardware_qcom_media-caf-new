@@ -1329,6 +1329,17 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
                 break;
             }
 #endif
+#ifdef V4L2_CID_MPEG_VIDC_VIDEO_IFRAME_X_RANGE
+        case OMX_QcomIndexParamSetMVSearchrange:
+            {
+                if (!handle->venc_set_param(paramData,
+                            (OMX_INDEXTYPE) OMX_QcomIndexParamSetMVSearchrange)) {
+                    DEBUG_PRINT_ERROR("ERROR: Setting Searchrange");
+                    return OMX_ErrorUnsupportedSetting;
+                }
+                break;
+            }
+#endif
         case OMX_IndexParamVideoSliceFMO:
         default:
             {
