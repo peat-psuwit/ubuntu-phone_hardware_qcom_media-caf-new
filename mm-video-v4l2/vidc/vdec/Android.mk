@@ -1,6 +1,7 @@
 ifneq ($(BUILD_TINY_ANDROID),true)
 
 ROOT_DIR := $(call my-dir)
+OMX_VIDEO_PATH := $(ROOT_DIR)/../..
 
 include $(CLEAR_VARS)
 LOCAL_PATH:= $(ROOT_DIR)
@@ -86,7 +87,6 @@ libOmxVdec-def += -DMAX_RES_1080P
 libOmxVdec-def += -DMAX_RES_1080P_EBI
 libOmxVdec-def += -DPROCESS_EXTRADATA_IN_OUTPUT_PORT
 libOmxVdec-def += -D_MSM8974_
-libOmxVdec-def += -D_HEVC_USE_ADSP_HEAP_
 endif
 libOmxVdec-def += -D_ANDROID_ICS_
 
@@ -150,6 +150,7 @@ LOCAL_SRC_FILES         := src/frameparser.cpp
 LOCAL_SRC_FILES         += src/h264_utils.cpp
 LOCAL_SRC_FILES         += src/ts_parser.cpp
 LOCAL_SRC_FILES         += src/mp4_utils.cpp
+LOCAL_SRC_FILES         += src/hevc_utils.cpp
 ifeq ($(call is-board-platform-in-list,msm8974 msm8610 msm8226 apq8084 mpq8092 msm_bronze msm8916),true)
 LOCAL_SRC_FILES         += src/omx_vdec_msm8974.cpp
 else
@@ -194,7 +195,7 @@ LOCAL_SRC_FILES         += src/h264_utils.cpp
 LOCAL_SRC_FILES         += src/ts_parser.cpp
 LOCAL_SRC_FILES         += src/mp4_utils.cpp
 
-ifeq ($(call is-board-platform-in-list,msm8974 msm8226),true)
+ifeq ($(call is-board-platform-in-list,msm8974 msm8226 msm8916),true)
 LOCAL_SHARED_LIBRARIES  += libHevcSwDecoder
 LOCAL_SRC_FILES         += src/omx_vdec_hevc_swvdec.cpp
 else
