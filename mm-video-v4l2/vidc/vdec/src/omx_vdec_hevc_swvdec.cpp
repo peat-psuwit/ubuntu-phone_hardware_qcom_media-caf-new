@@ -6108,10 +6108,6 @@ OMX_ERRORTYPE  omx_vdec::empty_this_buffer(OMX_IN OMX_HANDLETYPE         hComp,
         codec_config_flag = true;
         DEBUG_PRINT_LOW("%s: codec_config buffer", __FUNCTION__);
     }
-    else
-    {
-        codec_config_flag = false;
-    }
 
 #ifdef _ANDROID_
     if(iDivXDrmDecrypt)
@@ -6395,6 +6391,8 @@ OMX_ERRORTYPE  omx_vdec::empty_this_buffer_proxy(OMX_IN OMX_HANDLETYPE         h
             DEBUG_PRINT_ERROR("Failed to qbuf Input buffer to driver");
             return OMX_ErrorHardware;
         }
+        codec_config_flag = false;
+        DEBUG_PRINT_LOW("%s: codec_config cleared", __FUNCTION__);
         if(!streaming[OUTPUT_PORT])
         {
             enum v4l2_buf_type buf_type;
@@ -7346,18 +7344,23 @@ OMX_ERRORTYPE omx_vdec::fill_buffer_done(OMX_HANDLETYPE hComp,
         return OMX_ErrorBadParameter;
     }
 #ifdef ADAPTIVE_PLAYBACK_SUPPORTED
-    if (m_smoothstreaming_mode && m_out_mem_ptr) {
-        OMX_U32 buf_index = buffer - m_out_mem_ptr;
-        BufferDim_t dim;
-        private_handle_t *private_handle = NULL;
-        dim.sliceWidth = drv_ctx.video_resolution.frame_width;
-        dim.sliceHeight = drv_ctx.video_resolution.frame_height;
-        if (native_buffer[buf_index].privatehandle)
-            private_handle = native_buffer[buf_index].privatehandle;
-        if (private_handle) {
-            DEBUG_PRINT_LOW("set metadata: update buf-geometry with stride %d slice %d",
-                dim.sliceWidth, dim.sliceHeight);
-            setMetaData(private_handle, UPDATE_BUFFER_GEOMETRY, (void*)&dim);
+    if (m_swvdec_mode != SWVDEC_MODE_PARSE_DECODE)
+    {
+        /* in full sw solution stride doesn't get change with change of
+           resolution, so don't update geomatry in case of full sw */
+        if (m_smoothstreaming_mode && m_out_mem_ptr) {
+            OMX_U32 buf_index = buffer - m_out_mem_ptr;
+            BufferDim_t dim;
+            private_handle_t *private_handle = NULL;
+            dim.sliceWidth = drv_ctx.video_resolution.frame_width;
+            dim.sliceHeight = drv_ctx.video_resolution.frame_height;
+            if (native_buffer[buf_index].privatehandle)
+                private_handle = native_buffer[buf_index].privatehandle;
+            if (private_handle) {
+                DEBUG_PRINT_LOW("set metadata: update buf-geometry with stride %d slice %d",
+                    dim.sliceWidth, dim.sliceHeight);
+                setMetaData(private_handle, UPDATE_BUFFER_GEOMETRY, (void*)&dim);
+            }
         }
     }
 #endif
@@ -10627,8 +10630,8 @@ void omx_vdec::swvdec_fill_buffer_done(SWVDEC_OPBUFFER *m_pSwVdecOpBuffer)
         if ((m_pSwVdecOpBuffer->nHeight != rectangle.nHeight) ||
             (m_pSwVdecOpBuffer->nWidth != rectangle.nWidth))
         {
-            //drv_ctx.video_resolution.frame_height = m_pSwVdecOpBuffer->nHeight;
-            //drv_ctx.video_resolution.frame_width = m_pSwVdecOpBuffer->nWidth;
+            drv_ctx.video_resolution.frame_height = m_pSwVdecOpBuffer->nHeight;
+            drv_ctx.video_resolution.frame_width = m_pSwVdecOpBuffer->nWidth;
 
             rectangle.nLeft = 0;
             rectangle.nTop = 0;
