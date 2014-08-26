@@ -208,7 +208,6 @@ venc_dev::venc_dev(class omx_venc *venc_class)
     memset(&voptimecfg, 0, sizeof(voptimecfg));
     memset(&capability, 0, sizeof(capability));
     memset(&hier_p_layers,0,sizeof(hier_p_layers));
-    memset(&display_info,0,sizeof(display_info));
     is_searchrange_set = false;
     enable_mv_narrow_searchrange = false;
     memset(&ltrinfo, 0, sizeof(ltrinfo));
@@ -762,14 +761,7 @@ bool venc_dev::venc_open(OMX_U32 codec)
 
     property_get("ro.board.platform", platform_name, "0");
     property_get("vidc.enc.narrow.searchrange", narrow_searchrange, "0");
-    if (atoi(narrow_searchrange)) {
-        enable_mv_narrow_searchrange = true;
-        sp<IBinder> display(SurfaceComposerClient::getBuiltInDisplay(
-                        ISurfaceComposer::eDisplayIdMain));
-        SurfaceComposerClient::getDisplayInfo(display, &display_info);
-        DEBUG_PRINT_LOW("Display panel resolution %dX%d",
-            display_info.w, display_info.h);
-    }
+    enable_mv_narrow_searchrange = atoi(narrow_searchrange);
 
     if (!strncmp(platform_name, "msm8610", 7)) {
         device_name = (OMX_STRING)"/dev/video/q6_enc";
@@ -1192,16 +1184,13 @@ bool venc_dev::venc_set_param(void *paramData, OMX_INDEXTYPE index)
                     if (!venc_set_color_format(portDefn->format.video.eColorFormat)) {
                         return false;
                     }
-#ifdef V4L2_CID_MPEG_VIDC_VIDEO_IFRAME_X_RANGE
-                    if ((display_info.w * display_info.h) > (OMX_CORE_720P_WIDTH * OMX_CORE_720P_HEIGHT)
-                        && enable_mv_narrow_searchrange &&
+                    if (enable_mv_narrow_searchrange &&
                         (m_sVenc_cfg.input_width * m_sVenc_cfg.input_height) >=
                         (OMX_CORE_1080P_WIDTH * OMX_CORE_1080P_HEIGHT)) {
                         if (venc_set_searchrange() == false) {
                             DEBUG_PRINT_ERROR("ERROR: Failed to set search range");
                         }
                     }
-#endif
                     if (m_sVenc_cfg.input_height != portDefn->format.video.nFrameHeight ||
                             m_sVenc_cfg.input_width != portDefn->format.video.nFrameWidth) {
                         DEBUG_PRINT_LOW("Basic parameter has changed");
@@ -3210,17 +3199,6 @@ bool venc_dev::venc_set_intra_period(OMX_U32 nPFrames, OMX_U32 nBFrames)
             (codec_profile.profile != V4L2_MPEG_VIDEO_H264_PROFILE_HIGH)) {
         nBFrames=0;
     }
-#ifdef V4L2_CID_MPEG_VIDC_VIDEO_IFRAME_X_RANGE
-    if (nBFrames && (display_info.w * display_info.h > OMX_CORE_720P_WIDTH * OMX_CORE_720P_HEIGHT)
-        && enable_mv_narrow_searchrange && (m_sVenc_cfg.input_width * m_sVenc_cfg.input_height >=
-        OMX_CORE_1080P_WIDTH * OMX_CORE_1080P_HEIGHT || is_searchrange_set)) {
-        int pframes = ((nPFrames + 1) * (nBFrames + 1)) - 1;
-        DEBUG_PRINT_HIGH("Warning: Increased nPFrames from %d to %d as B-frames not supported",
-            (int)nPFrames, pframes);
-        nPFrames = pframes;
-        nBFrames = 0;
-    }
-#endif
 
     control.id = V4L2_CID_MPEG_VIDC_VIDEO_NUM_P_FRAMES;
     if (!nBFrames) {
