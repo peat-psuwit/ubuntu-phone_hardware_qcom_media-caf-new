@@ -633,4 +633,10 @@ class omx_video: public qc_omx_component
 
 };
 
+#include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
+#define EXTRADATA_NONE MSM_VIDC_EXTRADATA_NONE
+#define EXTRADATA_METADATA_MBI MSM_VIDC_EXTRADATA_METADATA_MBI
+#endif
+
 #endif // __OMX_VIDEO_BASE_H__
