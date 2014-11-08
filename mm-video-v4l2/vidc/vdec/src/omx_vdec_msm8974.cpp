@@ -2883,10 +2883,12 @@ OMX_ERRORTYPE  omx_vdec::get_parameter(OMX_IN OMX_HANDLETYPE     hComp,
                                             QOMX_COLOR_FORMATYUV420PackedSemiPlanar32m;
                                     else if (1 == portFmt->nIndex)
                                         portFmt->eColorFormat = OMX_COLOR_FormatYUV420Planar;
+#ifdef VDEC_CODECTYPE_MVC
                                     else if (2 == portFmt->nIndex &&
                                         drv_ctx.decoder_format == VDEC_CODECTYPE_MVC)
                                         portFmt->eColorFormat = (OMX_COLOR_FORMATTYPE)
                                             QOMX_COLOR_FORMATYUV420PackedSemiPlanar32mMultiView;
+#endif
                                     else {
                                         DEBUG_PRINT_LOW("get_parameter: OMX_IndexParamVideoPortFormat:"\
                                                 " NoMore Color formats");
