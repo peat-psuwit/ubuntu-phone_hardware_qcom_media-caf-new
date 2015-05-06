@@ -8449,7 +8449,12 @@ OMX_ERRORTYPE omx_vdec::update_portdef(OMX_PARAM_PORTDEFINITIONTYPE *portDefn)
        (portDefn->format.video.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar)) {
         portDefn->format.video.nStride = ALIGN(drv_ctx.video_resolution.frame_width, 16);
         portDefn->format.video.nSliceHeight = drv_ctx.video_resolution.frame_height;
+    } else if ((portDefn->format.video.eColorFormat == QOMX_COLOR_FORMATYUV420PackedSemiPlanar32m) ||
+               (portDefn->format.video.eColorFormat == QOMX_COLOR_FORMATYUV420PackedSemiPlanar32mMultiView)) {
+        portDefn->format.video.nStride = ALIGN(drv_ctx.video_resolution.frame_width, 32);
+        portDefn->format.video.nSliceHeight = ALIGN(drv_ctx.video_resolution.frame_height, 32);
     }
+
     DEBUG_PRINT_HIGH("update_portdef(%lu): Width = %lu Height = %lu Stride = %ld "
             "SliceHeight = %lu eColorFormat = %lu nBufSize %lu nBufCnt %lu",
             portDefn->nPortIndex,
